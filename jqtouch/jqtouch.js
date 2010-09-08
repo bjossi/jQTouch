@@ -56,6 +56,7 @@
         function init(options) {
 
             var defaults = {
+				offset: 0,
                 addGlossToIcon: true,
                 backSelector: '.back, .cancel, .goback',
                 cacheGetRequests: true,
@@ -363,7 +364,7 @@
             $(':focus').blur();
 
             // Make sure we are scrolled up to hide location bar
-            toPage.css('top', window.pageYOffset);
+            toPage.css('top', jQTSettings.offset);
 
             // Define callback to run after animation completes
             var callback = function animationEnd(event) {
@@ -378,7 +379,7 @@
                         toPage.toggleClass('reverse');
                         fromPage.toggleClass('reverse');
                     }
-                    toPage.css('top', 0);
+                    toPage.css('top', jQTSettings.offset);
                 } else {
                     fromPage.removeClass('current');
                 }
@@ -403,6 +404,10 @@
             fromPage.trigger('pageAnimationStart', { direction: 'out' });
             toPage.trigger('pageAnimationStart', { direction: 'in' });
 
+			if(toPage.attr('id') === fromPage.attr('id')) { 
+            	animation = null;
+            }
+			
             if ($.support.WebKitAnimationEvent && animation && jQTSettings.useAnimations) {
                 tapReady = false;
                 if (backwards) {
@@ -451,7 +456,9 @@
                     $node.attr('id', 'page-' + (++newPageCount));
                 }
 
-		        $body.trigger('pageInserted', {page: $node.appendTo($body)});
+				$('#jqt').find('#' + $node.attr('id')).remove();
+		        
+				$body.trigger('pageInserted', {page: $node.appendTo($body)});
 
                 if ($node.hasClass('current') || !targetPage) {
                     targetPage = $node;
